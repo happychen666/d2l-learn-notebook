@@ -1,0 +1,103 @@
+在使用 PyTorch 训练模型时，获取优化后的权重和偏置值非常简单。您可以通过访问模型的参数来获取这些值。以下是详细步骤和示例，展示如何在训练完成后提取优化后的权重和偏置。
+
+### 示例：获取优化后的权重和偏置
+
+我们将继续之前的线性回归模型示例，在训练完成后提取优化后的权重和偏置值。
+
+#### 1. 导入所需的库
+
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+```
+
+#### 2. 创建线性回归模型
+
+```python
+class LinearRegressionModel(nn.Module):
+    def __init__(self):
+        super(LinearRegressionModel, self).__init__()
+        self.linear = nn.Linear(1, 1)  # 输入特征1，输出特征1
+
+    def forward(self, x):
+        return self.linear(x)
+```
+
+#### 3. 准备训练数据
+
+```python
+# 生成训练数据
+x_train = torch.tensor([[1.0], [2.0], [3.0], [4.0]], requires_grad=False)  # 特征
+y_train = torch.tensor([[2.0], [3.0], [4.0], [5.0]], requires_grad=False)  # 标签
+```
+
+#### 4. 实例化模型和优化器
+
+```python
+# 实例化模型
+model = LinearRegressionModel()
+
+# 实例化优化器
+optimizer = optim.SGD(model.parameters(), lr=0.1)  # 学习率为0.1
+```
+
+#### 5. 定义损失函数
+
+```python
+# 定义损失函数
+criterion = nn.MSELoss()
+```
+
+#### 6. 训练模型
+
+```python
+# 训练过程
+num_epochs = 100
+for epoch in range(num_epochs):
+    # 1. 前向传播
+    y_pred = model(x_train)
+
+    # 2. 计算损失
+    loss = criterion(y_pred, y_train)
+
+    # 3. 清零梯度
+    optimizer.zero_grad()
+
+    # 4. 反向传播
+    loss.backward()
+
+    # 5. 更新参数
+    optimizer.step()
+```
+
+#### 7. 获取优化后的权重和偏置
+
+在训练完成后，您可以通过以下方式获取模型的权重和偏置：
+
+```python
+# 获取优化后的权重和偏置
+for name, param in model.named_parameters():
+    if param.requires_grad:
+        print(f"{name} = {param.data.numpy()}")
+```
+
+### 输出示例
+
+- `weight` 和 `bias` 是模型中参数的名称，您可以通过 `param.data` 访问它们的值。
+- 使用 `numpy()` 将 PyTorch 张量转换为 NumPy 数组以方便查看和处理。
+
+### 示例输出
+
+在训练完成后，您可能会看到类似如下的输出：
+
+```
+linear.weight = [[0.8]]
+linear.bias = [1.2]
+```
+
+这表示模型的权重和偏置值已经被更新为优化后的值。
+
+### 总结
+
+通过访问模型的参数，您可以轻松获取优化后的权重和偏置值。使用 `model.named_parameters()` 方法，您可以以名称和值的形式提取所有可训练的参数。这在模型评估和后续使用中非常有用。
